@@ -1,30 +1,32 @@
 #include "mapImp.h"
 
-HANDLE Console;		/* Identify action and I/O stream */
+HANDLE scrout, keyin;
+COORD scr_size;
+
+BLDNG **block;
+CELL **roads;
+AEDV *fleet;
+
 
 int main(){
 
-    COORD scrsize;
-    int row;
-    int col;
-    unsigned char ch;
+    long outmode;
 
-    /* For console output via Windows */
-    Console = GetStdHandle(STD_OUTPUT_HANDLE);
-    /* Determine screen size */
-    scrsize = GetLargestConsoleWindowSize(Console);
-    printf("Size: r: %d c: %d\n", scrsize.Y, scrsize.X);
-    
-    move_cursor(2, 1);
-    printf("Please enter number of buildings along the avenue:");
-    scanf("%i", &row);
-    printf("Please enter number of buildings along the street:");
-    scanf("%i", &col);
-    
-    draw_quadrant(row, col, 4);
-    
-    
-    fflush(stdin);
+    /* Microsoft specific commands: */
+    if ((scrout = GetStdHandle(STD_OUTPUT_HANDLE)) == INVALID_HANDLE_VALUE)
+	    terminate("Can't open output");
+
+    if (!GetConsoleMode(scrout, &outmode))
+	    terminate("Can't get old console mode");
+
+    outmode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+    if (!SetConsoleMode(scrout, outmode))
+	    terminate("Can't set console mode");
+        
+    screen_size();
+    buildBlock();
+
+    //fflush(stdin);
     getchar();
     return 0;
 }

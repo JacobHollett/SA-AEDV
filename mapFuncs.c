@@ -1,50 +1,55 @@
 #include "mapImp.h"
 
-void move_cursor(int row, int col){
 
-    /* Move cursor to specified row and column */
-    COORD coord;
-    coord.X = col;
-    coord.Y = row;
-    /* Windows function to position cursor */
-    SetConsoleCursorPosition(Console, coord);
-
+void terminate(char* msg)
+{
+/* Fatal error detected - terminate */
+printf("Error: %s\n", msg);
+(void) getchar();
+exit(1);
 }
 
-//function adapted from Prof. Hughes, for drawing fixed 3x3 buildings
-void draw_building(int ulr, int ulc){
-    /* 
-    - Draw box at ulr, ulc
-    - Height and width are "scaled"
-    */
-    int rc;	/* Row count */
-    int cc;	/* Column count */
+void screen_size()
+{
+/*
+ - Query Windows for new window size
+ - The screen (window) must be resized before this is called (see check_kb())
+*/
+CONSOLE_SCREEN_BUFFER_INFO ScreenBufferInfo;
 
-    /* Top row */
-    move_cursor(ulr, ulc);
-    DISP(UL);
-	DISP(HBAR);
-    DISP(UR);
+/* Get new screen size */
+GetConsoleScreenBufferInfo(scrout, &ScreenBufferInfo);
 
-    /* Center Row */
-	move_cursor(ulr+1, ulc);
-	DISP(VBAR);
-    DISP(SHADE);
-	DISP(VBAR);
+/* Erase existing diagnostic line */
+CUP(1, scr_size.Y)
+EL(scr_size.Y)
+
+/* Get new screen size */
+scr_size.X = ScreenBufferInfo.srWindow.Right - ScreenBufferInfo.srWindow.Left + 1;
+scr_size.Y = ScreenBufferInfo.srWindow.Bottom - ScreenBufferInfo.srWindow.Top + 1;
+
+/* Clear the screen */
+CLRSCR
+
+/* Resizing displays cursor - hide it */
+printf(CSI "?25l");
+}
+
+void buildBlock(){
+
+    int x, y;
+    x = 4;
+    y = 3;
+
+    block = (BLDNG**)malloc(sizeof(BLDNG*) * x);
+    for(int i = 0; i < x; i++)
+        block[i] = (BLDNG*)malloc(sizeof(BLDNG) * y);
     
-
-    /* Bottom row */
-    move_cursor(ulr+2, ulc);
-    DISP(LL);
-    DISP(HBAR);
-    DISP(LR);
-}
-
-void draw_quadrant(int numX, int numY, int clock){
-
-    for(int i = 0; i < numX; i++){
-        for(int j = 0; j < numY; j++){
-            draw_building(5+6*j,6*i);
+    for(int i = 0; i < x; i++){
+        for(int j = 0; j < y; j++){
+            block[i][j].x = i;
+            block[i][j].y = j;
+            printf("Building %i,%i\n",block[i][j].x,block[i][j].y);
         }
     }
 

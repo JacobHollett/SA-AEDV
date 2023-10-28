@@ -1,27 +1,64 @@
 /*Header file contains relevant includes, defintions, 
 globals, structures and function declerations.*/
+#pragma once
+
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <math.h>
-#include <Windows.h>
+#include <windows.h>
+#include <conio.h>
 
-#define NUL	0x00
-#define ESC	0x1b
+#define NUL	'\0'
 
-#define UL		218
-#define LL		192
-#define UR		191
-#define LR		217
-#define HBAR	196
-#define VBAR	179
-#define SHADE   178
+/* Prefixes for ESC sequences */
+#define ESC "\x1b"	/* Escape */
+#define CSI "\x1b["	/* Control Sequence Introducer */
 
-#define	DISP(x)	putc((x),stdout)
+#define TRUE	1
+#define FALSE	0
 
-extern HANDLE Console;
+/* Some commonly used VT-100 commands */
+#define CUP(c,r)	printf(CSI "%d;%dH", (r), (c)); /* Move cursor position to col, row */
+#define EL(r)		printf(CSI "%d;1H" CSI "K", (r)); /* Erase in Line */
+#define CLRSCR		printf(CSI "2J");
 
-void move_cursor(int row, int col);
-void draw_building(int ulr, int ulc);
-void draw_quadrant(int numX, int numY, int clock);
+/* Colour: ESC [ <n> m */
+enum VT100_COLOURS {
+FGWHITE = 32,
+BGRED = 41,
+BGGREEN = 42, 
+BGYELLOW = 43,
+BGBLUE = 44,
+BGCYAN = 46
+};
+
+enum ST_DIR { East, West };
+enum AVE_DIR { North, South };
+enum BLDG_TYPE { CHG, STB, BOTH };
+enum QUAD { NE, N, NW, E, LBL, W, SE, S, SW };
+
+typedef struct aedv{
+    int x,y;
+}AEDV;
+
+typedef struct bldng{
+    int x;
+    int y;
+    enum BLDG_TYPE bt;
+    enum QUAD qd;
+}BLDNG;
+
+typedef struct cell{
+    enum ST_DIR dir1;
+    enum AVE_DIR dir2;
+}CELL;
+
+extern HANDLE scrout, keyin;
+extern COORD scr_size;
+extern BLDNG **block;
+extern CELL **roads;
+extern AEDV *fleet;
+
+void terminate(char* msg);
+void screen_size();
+void buildBlock();
