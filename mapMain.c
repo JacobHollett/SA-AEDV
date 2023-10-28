@@ -6,6 +6,7 @@ COORD scr_size;
 BLDNG **block;
 CELL **roads;
 AEDV *fleet;
+int STOP = FALSE;
 
 
 int main(){
@@ -24,10 +25,19 @@ int main(){
 	    terminate("Can't set console mode");
         
     screen_size();
-    buildBlock();
+    buildBlock(8, 3);
+    build_fleet();
 
-    //fflush(stdin);
-    getchar();
+    populate_map(8,3);
+    
+    while(!STOP){
+        if (_kbhit())
+			STOP = check_kb();
+    }
+    
+    free(block);
+    free(roads);
+    free(fleet);
     return 0;
 }
 

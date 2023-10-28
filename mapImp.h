@@ -29,7 +29,8 @@ BGRED = 41,
 BGGREEN = 42, 
 BGYELLOW = 43,
 BGBLUE = 44,
-BGCYAN = 46
+BGCYAN = 46,
+BGBLACK = 49
 };
 
 enum ST_DIR { East, West };
@@ -38,7 +39,9 @@ enum BLDG_TYPE { CHG, STB, BOTH };
 enum QUAD { NE, N, NW, E, LBL, W, SE, S, SW };
 
 typedef struct aedv{
+    int IDNUM;
     int x,y;
+    int destx, desty;
 }AEDV;
 
 typedef struct bldng{
@@ -58,7 +61,14 @@ extern COORD scr_size;
 extern BLDNG **block;
 extern CELL **roads;
 extern AEDV *fleet;
+extern int STOP;
 
 void terminate(char* msg);
 void screen_size();
-void buildBlock();
+void buildBlock(int x, int y);
+void build_fleet();
+void box(int ulx, int uly, char *name, int colour, char *ID);
+void populate_map(int x, int y);
+void print_controls(int code);
+void status_window();
+int check_kb();
