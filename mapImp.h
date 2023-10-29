@@ -7,6 +7,10 @@ globals, structures and function declerations.*/
 #include <stdio.h>
 #include <windows.h>
 #include <conio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <io.h>
+#include <fcntl.h>     /* for _O_TEXT and _O_BINARY */
 
 #define NUL	'\0'
 
@@ -21,6 +25,9 @@ globals, structures and function declerations.*/
 #define CUP(c,r)	printf(CSI "%d;%dH", (r), (c)); /* Move cursor position to col, row */
 #define EL(r)		printf(CSI "%d;1H" CSI "K", (r)); /* Erase in Line */
 #define CLRSCR		printf(CSI "2J");
+
+#define TRUNCATE(name)	name[strlen(name)-1] = '\0'
+#define NAMELEN	16
 
 /* Colour: ESC [ <n> m */
 enum VT100_COLOURS {
@@ -51,21 +58,32 @@ typedef struct bldng{
     enum QUAD qd;
 }BLDNG;
 
-typedef struct cell{
-    enum ST_DIR dir1;
-    enum AVE_DIR dir2;
+typedef struct cell{    //roads structure mimics linked list 
+    struct cell *next1; //each cell points to each potential next cells
+    struct cell *next2;
+    struct cell *next3;
+    int occupied;
 }CELL;
+
+typedef struct xy{
+    int x;
+    int y;
+}XY;
 
 extern HANDLE scrout, keyin;
 extern COORD scr_size;
 extern BLDNG **block;
 extern CELL **roads;
 extern AEDV *fleet;
-extern int STOP;
+extern XY bounds;
+extern int STOP;    //loop stop controller
+extern FILE* bfd;
 
 void terminate(char* msg);
+void read_file();
 void screen_size();
-void buildBlock(int x, int y);
+void buildBlock();
+void orient_roads(int a1, int s1);
 void build_fleet();
 void box(int ulx, int uly, char *name, int colour, char *ID);
 void populate_map(int x, int y);

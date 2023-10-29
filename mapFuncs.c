@@ -9,6 +9,24 @@ printf("Error: %s\n", msg);
 exit(1);
 }
 
+void read_file(){
+
+    enum ST_DIR s1dir;
+    enum AVE_DIR a1dir;
+
+    fread(&bounds.x, sizeof(int), 1, bfd);
+    fread(&bounds.y, sizeof(int), 1, bfd);
+
+    buildBlock();
+
+    fread(&s1dir, sizeof(int), 1, bfd);
+    fread(&a1dir, sizeof(int), 1, bfd);
+
+    orient_roads(s1dir, a1dir);
+
+    fclose(bfd);
+}
+
 void screen_size()
 {
 /*
@@ -35,25 +53,36 @@ CLRSCR
 printf(CSI "?25l");
 }
 
-void buildBlock(int x, int y){
+void buildBlock(){  //dynamically creating 2D arrays of buildings and roads
 
-    
-    //dynamically creating 2D arrays of buildings and roads
-    block = (BLDNG**)malloc(sizeof(BLDNG*) * x);
-    for(int i = 0; i < x; i++)
-        block[i] = (BLDNG*)malloc(sizeof(BLDNG) * y);
+    block = (BLDNG**)malloc(sizeof(BLDNG*) * bounds.x);
+    for(int i = 0; i < bounds.x; i++)
+        block[i] = (BLDNG*)malloc(sizeof(BLDNG) * bounds.y);
 
-    roads = (CELL**)malloc(sizeof(CELL) * (x+1));
-    for(int i = 0; i < x; i++)
-        roads[i] = (CELL*)malloc(sizeof(CELL) * (y + 1));
+    roads = (CELL**)malloc(sizeof(CELL) * (bounds.x+1));   //We create K more cells than is required,
+    for(int i = 0; i < (bounds.x+1); i++)                    //where K is number of buildings, these cells go unused
+        roads[i] = (CELL*)malloc(sizeof(CELL) * (bounds.y+1));
     
-    for(int i = 0; i < x; i++){
-        for(int j = 0; j < y; j++){
+    for(int i = 0; i < bounds.x; i++){
+        for(int j = 0; j < bounds.y; j++){
             block[i][j].x = i;
             block[i][j].y = j;
         }
     }
 
+}
+
+void orient_roads(int a1, int s1){
+    
+    roads[0][0].next1 = &roads[1][0];
+    roads[0][0].next2 = &roads[0][1];
+    roads[bounds.x][0].next1 = &roads[bounds.x-1][0];
+    roads[bounds.x][0].next2 = &roads[bounds.x][1];
+    roads[0][bounds.y].next1 = &roads[1][bounds.y];
+    roads[0][bounds.y].next2 = &roads[0][bounds.y-1];
+    roads[bounds.x][bounds.y].next1 = &roads[bounds.x-1][bounds.y];
+    roads[bounds.x][bounds.y].next2 = &roads[bounds.x][bounds.y];
+    
 }
 
 void build_fleet(){
@@ -62,9 +91,9 @@ void build_fleet(){
     for(int i = 0; i < 4; i++){
         fleet[i].x = i;
         fleet[i].y = i+3;
-        fleet[i].destx = 0;
-        fleet[i].desty = 0;
-        fleet[i].IDNUM = (i*3+1)*2-3;
+        fleet[i].destx = fleet[i].x;
+        fleet[i].desty = fleet[i].y;
+        fleet[i].IDNUM = i+1;
     }
 }
 
@@ -110,20 +139,43 @@ void print_controls(int code){
     if(code == 1)
         printf("D = DIAGNOSTIC WINDOW           R = Resize Window           ! = END");
     else
-        printf("M = MAP WINDOW                  R = Resize Window           ! = END");
+        printf("M = MAP WINDOW                  N = Set Destination         R = Resize Window           ! = END");
         printf(CSI "%dm", BGBLACK);
 }
 
 void status_window(){
-
+    
     CUP(1,4)
 
     printf("DIAGNOSTIC WINDOW\n\n");
     for(int i = 0; i < 4; i++){
         printf("AEDV #%i: %i,%i -> %i,%i\n", fleet[i].IDNUM, fleet[i].x, fleet[i].y, fleet[i].destx, fleet[i].desty);
     }
-    print_controls(2);
 
+    print_controls(2);
+    
+
+}
+
+void set_dest(){
+
+    int idval;
+    int dstx;
+    int dsty;
+    
+    CUP(1, 12)
+    printf("\nInput AEDV ID: ");
+    scanf("%i", &idval);
+    getchar();
+    printf("Input new destination x coordinate: ");
+    scanf("%i", &dstx);
+    getchar();
+    printf("Input new destination y coordinate: ");
+    scanf("%i", &dsty);
+    getchar();
+    fleet[idval-1].destx = dstx;
+    fleet[idval-1].desty = dsty;
+    status_window();
 }
 
 int check_kb(){
@@ -135,7 +187,7 @@ int check_kb(){
         case 'r':
         case 'R':
             screen_size();
-	        populate_map(8,3);
+	        populate_map(bounds.x,bounds.y);
             rc = FALSE;
 	        break;
         case 'd':
@@ -147,9 +199,15 @@ int check_kb(){
         case 'm':
         case 'M':
             printf(CSI "?1049l");
-            populate_map(8,3);
+            populate_map(bounds.x,bounds.y);
             rc = FALSE;
 	        break;
+        case 'n':
+        case 'N':
+            printf(CSI "?1049h");
+            set_dest();
+            rc = FALSE;
+            break;
         case '!':
             rc = TRUE;
 	        break;
@@ -157,3 +215,4 @@ int check_kb(){
     printf(CSI "?25l");	/* Hide cursor */
     return rc;
 }
+
