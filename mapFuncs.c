@@ -97,7 +97,7 @@ void buildBlock(){  //dynamically creating 2D arrays of buildings and roads
 
 }
 
-void orient_roads(int a1, int s1){
+void orient_roads(int a1, int s1){ 
     
     int flag = s1;
     
@@ -113,12 +113,14 @@ void orient_roads(int a1, int s1){
             }
             else if(flag == 0 && i != 2*bounds.x){
                 roads[i][j].next2 = &roads[i+1][j];
-                flag = 1;
             }
             else if(flag == 1 && i != 0){
                 roads[i][j].next1 = &roads[i-1][j];
-                flag = 0;
             }
+            if(flag == 0 && j != 0 && j != 2*bounds.y)
+                flag = 1;
+            else if(flag == 1 && j != 0 && j != 2*bounds.y)
+                flag = 0;
         }
     }
 
@@ -134,12 +136,14 @@ void orient_roads(int a1, int s1){
             }
             else if(flag == 0 && j != 0){
                 roads[i][j].next3 = &roads[i][j-1];
-                flag = 1;
             }
             else if(flag == 1 && j != 2*bounds.y){
                 roads[i][j].next4 = &roads[i][j+1];
-                flag = 0;
             }
+            if(flag == 0 && j != 0 && j != 2*bounds.y)
+                flag = 1;
+            else if(flag == 1 && j != 0 && j != 2*bounds.y)
+                flag = 0;
         }
     }
     
@@ -149,8 +153,8 @@ void build_fleet(){
     //dynamically creating fleet of four AEDV's
     fleet = (AEDV*)malloc(sizeof(AEDV*) * 4);
     for(int i = 0; i < 4; i++){
-        fleet[i].x = i;
-        fleet[i].y = 2*i;
+        fleet[i].x = 0;
+        fleet[i].y = 0;
         fleet[i].destx = fleet[i].x;
         fleet[i].desty = fleet[i].y;
         fleet[i].IDNUM = i+1;
@@ -193,9 +197,10 @@ void populate_map(){
             else
                 ID = "NA";
             
-            box(i*8+4,j*8+4,name, BGRED, ID);
+            box(i*8+5,j*8+5,name, BGRED, ID);
             name[1]++;
         }
+        name[1] = 'A';
         name[0]++;
     }
     print_controls(1);
@@ -222,6 +227,10 @@ void status_window(){
     }
 
     print_controls(2);
+    while(!STOP){
+        if (_kbhit())
+	        STOP = check_kb();
+    }
     
 
 }
@@ -257,28 +266,27 @@ int check_kb(){
         case 'R':
             screen_size();
 	        populate_map(bounds.x,bounds.y);
-            rc = FALSE;
+            rc = 0;
 	        break;
         case 'd':
         case 'D':
             printf(CSI "?1049h");
             status_window();
-            rc = FALSE;
+            rc = 0;
 	        break;
         case 'm':
         case 'M':
             printf(CSI "?1049l");
-            populate_map(bounds.x,bounds.y);
-            rc = FALSE;
+            rc = 1;
 	        break;
         case 'n':
         case 'N':
             printf(CSI "?1049h");
             set_dest();
-            rc = FALSE;
+            rc = 0;
             break;
         case '!':
-            rc = TRUE;
+            rc = 2;
 	        break;
     }
     printf(CSI "?25l");	/* Hide cursor */

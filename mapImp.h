@@ -26,8 +26,6 @@ globals, structures and function declerations.*/
 #define EL(r)		printf(CSI "%d;1H" CSI "K", (r)); /* Erase in Line */
 #define CLRSCR		printf(CSI "2J");
 
-#define TRUNCATE(name)	name[strlen(name)-1] = '\0'
-#define NAMELEN	16
 
 /* Colour: ESC [ <n> m */
 enum VT100_COLOURS {
@@ -94,3 +92,4 @@ void populate_map();
 void print_controls(int code);
 void status_window();
 int check_kb();
+void move();

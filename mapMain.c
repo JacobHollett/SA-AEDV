@@ -44,12 +44,13 @@ int main(int argc, char *argv[]){
     build_fleet();
 
     populate_map();
-    
+    move();
+    /*
     while(!STOP){
         if (_kbhit())
 			STOP = check_kb();
     }
-    
+    */
     free(block);
     free(roads);
     free(fleet);
