@@ -10,7 +10,7 @@ exit(1);
 }
 
 void read_file(){
-
+    BLDNG bd;
     enum ST_DIR s1dir;
     enum AVE_DIR a1dir;
 
@@ -24,6 +24,17 @@ void read_file(){
 
     orient_roads(s1dir, a1dir);
 
+    fread(&bd, sizeof(BLDNG), 1, bfd);
+    
+    while(bd.x > 0){
+        if(bd.x <= (bounds.x) && bd.y <= (bounds.y)){
+            block[bd.x-1][bd.y-1].bt = bd.bt;
+            block[bd.x-1][bd.y-1].qd = bd.qd;
+        }
+        
+        fread(&bd, sizeof(BLDNG), 1, bfd);
+    }
+    
     fclose(bfd);
 }
 
@@ -59,14 +70,28 @@ void buildBlock(){  //dynamically creating 2D arrays of buildings and roads
     for(int i = 0; i < bounds.x; i++)
         block[i] = (BLDNG*)malloc(sizeof(BLDNG) * bounds.y);
 
-    roads = (CELL**)malloc(sizeof(CELL) * (bounds.x+1));   //We create K more cells than is required,
-    for(int i = 0; i < (bounds.x+1); i++)                    //where K is number of buildings, these cells go unused
-        roads[i] = (CELL*)malloc(sizeof(CELL) * (bounds.y+1));
+    roads = (CELL**)malloc(sizeof(CELL) * ((2*bounds.x)+1));   //We create K more cells than is required,
+    for(int i = 0; i < ((2*bounds.x)+1); i++)                    //where K is number of buildings, these cells
+        roads[i] = (CELL*)malloc(sizeof(CELL) * ((2*bounds.y)+1));    //are considered occupied
     
     for(int i = 0; i < bounds.x; i++){
         for(int j = 0; j < bounds.y; j++){
             block[i][j].x = i;
             block[i][j].y = j;
+            block[i][j].bt = 3;
+        }
+    }
+    
+    for(int i = 0; i <= (2*bounds.x); i++){
+        for(int j = 0; j <= (2*bounds.y); j++){
+            roads[i][j].x = i;
+            roads[i][j].y = j;
+            
+            roads[i][j].next1 = NULL;
+            roads[i][j].next2 = NULL;
+            roads[i][j].next3 = NULL;
+            roads[i][j].next4 = NULL;
+            
         }
     }
 
@@ -74,14 +99,49 @@ void buildBlock(){  //dynamically creating 2D arrays of buildings and roads
 
 void orient_roads(int a1, int s1){
     
-    roads[0][0].next1 = &roads[1][0];
-    roads[0][0].next2 = &roads[0][1];
-    roads[bounds.x][0].next1 = &roads[bounds.x-1][0];
-    roads[bounds.x][0].next2 = &roads[bounds.x][1];
-    roads[0][bounds.y].next1 = &roads[1][bounds.y];
-    roads[0][bounds.y].next2 = &roads[0][bounds.y-1];
-    roads[bounds.x][bounds.y].next1 = &roads[bounds.x-1][bounds.y];
-    roads[bounds.x][bounds.y].next2 = &roads[bounds.x][bounds.y];
+    int flag = s1;
+    
+    //East West Connections
+    for(int i = 0; i <= 2*bounds.x; i++){
+        for(int j = 0; j <= 2*bounds.y; j+=2){
+            if(j == 0 || j == 2*bounds.y){
+                if(i != 0)
+                    roads[i][j].next1 = &roads[i-1][j];
+                
+                if(i != 2*bounds.x)
+                    roads[i][j].next2 = &roads[i+1][j];
+            }
+            else if(flag == 0 && i != 2*bounds.x){
+                roads[i][j].next2 = &roads[i+1][j];
+                flag = 1;
+            }
+            else if(flag == 1 && i != 0){
+                roads[i][j].next1 = &roads[i-1][j];
+                flag = 0;
+            }
+        }
+    }
+
+    flag = a1;
+    //North South connections
+    for(int i = 0; i <= 2*bounds.x; i+=2){
+        for(int j = 0; j <= 2*bounds.y; j++){
+            if(i == 0 || i == 2*bounds.x){
+                if(j != 0)
+                    roads[i][j].next3 = &roads[i][j-1];
+                if(j != 2*bounds.y)
+                    roads[i][j].next4 = &roads[i][j+1];
+            }
+            else if(flag == 0 && j != 0){
+                roads[i][j].next3 = &roads[i][j-1];
+                flag = 1;
+            }
+            else if(flag == 1 && j != 2*bounds.y){
+                roads[i][j].next4 = &roads[i][j+1];
+                flag = 0;
+            }
+        }
+    }
     
 }
 
@@ -90,7 +150,7 @@ void build_fleet(){
     fleet = (AEDV*)malloc(sizeof(AEDV*) * 4);
     for(int i = 0; i < 4; i++){
         fleet[i].x = i;
-        fleet[i].y = i+3;
+        fleet[i].y = 2*i;
         fleet[i].destx = fleet[i].x;
         fleet[i].desty = fleet[i].y;
         fleet[i].IDNUM = i+1;
@@ -116,14 +176,23 @@ void box(int ulx, int uly, char *name, int colour, char *ID){
 
 }
 
-void populate_map(int x, int y){
+void populate_map(){
 
     char name[] = "AA";
-    char *ID = "BT";
+    char *ID;
 
     printf(CSI "2J"); /* Clear screen */
-    for(int i = 0; i < x; i++){
-        for(int j = 0; j < y; j++){
+    for(int i = 0; i < bounds.x; i++){
+        for(int j = 0; j < bounds.y; j++){
+            if(block[i][j].bt == 0)
+                ID = "CG";
+            else if(block[i][j].bt == 1)
+                ID = "ST";
+            else if(block[i][j].bt == 2)
+                ID = "BT";
+            else
+                ID = "NA";
+            
             box(i*8+4,j*8+4,name, BGRED, ID);
             name[1]++;
         }
@@ -147,9 +216,9 @@ void status_window(){
     
     CUP(1,4)
 
-    printf("DIAGNOSTIC WINDOW\n\n");
+    printf("    DIAGNOSTIC   WINDOW\n\n");
     for(int i = 0; i < 4; i++){
-        printf("AEDV #%i: %i,%i -> %i,%i\n", fleet[i].IDNUM, fleet[i].x, fleet[i].y, fleet[i].destx, fleet[i].desty);
+        printf("    AEDV #%i: %i,%i -> %i,%i\n", fleet[i].IDNUM, fleet[i].x, fleet[i].y, fleet[i].destx, fleet[i].desty);
     }
 
     print_controls(2);

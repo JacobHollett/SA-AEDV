@@ -42,8 +42,9 @@ BGBLACK = 49
 
 enum ST_DIR { East, West };
 enum AVE_DIR { North, South };
-enum BLDG_TYPE { CHG, STB, BOTH };
+enum BLDG_TYPE { CHG, STB, BOTH, NEITHER};
 enum QUAD { NE, N, NW, E, LBL, W, SE, S, SW };
+
 
 typedef struct aedv{
     int IDNUM;
@@ -59,9 +60,12 @@ typedef struct bldng{
 }BLDNG;
 
 typedef struct cell{    //roads structure mimics linked list 
-    struct cell *next1; //each cell points to each potential next cells
-    struct cell *next2;
-    struct cell *next3;
+    int x;
+    int y;
+    struct cell *next1; //points behind
+    struct cell *next2; //points forward
+    struct cell *next3; //points up
+    struct cell *next4; //points down
     int occupied;
 }CELL;
 
@@ -86,7 +90,7 @@ void buildBlock();
 void orient_roads(int a1, int s1);
 void build_fleet();
 void box(int ulx, int uly, char *name, int colour, char *ID);
-void populate_map(int x, int y);
+void populate_map();
 void print_controls(int code);
 void status_window();
 int check_kb();

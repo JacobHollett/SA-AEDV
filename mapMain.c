@@ -41,11 +41,9 @@ int main(int argc, char *argv[]){
     screen_size();
     read_file();
 
-    
-    
     build_fleet();
 
-    populate_map(bounds.x,bounds.y);
+    populate_map();
     
     while(!STOP){
         if (_kbhit())
