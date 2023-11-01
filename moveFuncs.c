@@ -65,28 +65,28 @@ void move(){
                 else if(moves[j] == 2){
                     CUP(a0[j].x*4+1+i,a0[j].y*4+1)
                     putchar('@');
-                    Sleep(50);
+                    Sleep(25);
                     CUP(a0[j].x*4+1+i,a0[j].y*4+1)
                     putchar(' ');
                 }
                 else if(moves[j] == 3){
                     CUP(a0[j].x*4+1,a0[j].y*4+1-i)
                     putchar('@');
-                    Sleep(50);
+                    Sleep(25);
                     CUP(a0[j].x*4+1,a0[j].y*4+1-i)
                     putchar(' ');
                 }
                 else if(moves[j] == 4){
                     CUP(a0[j].x*4+1,a0[j].y*4+1+i)
                     putchar('@');
-                    Sleep(50);
+                    Sleep(25);
                     CUP(a0[j].x*4+1,a0[j].y*4+1+i)
                     putchar(' ');
                 }
                 else{
                     CUP(a0[j].x*4+1,a0[j].y*4+1)
                     putchar('@');
-                    Sleep(50);
+                    Sleep(25);
                 }
             
             } 

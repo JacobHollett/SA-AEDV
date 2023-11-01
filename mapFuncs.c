@@ -140,9 +140,9 @@ void orient_roads(int a1, int s1){
             else if(flag == 1 && j != 2*bounds.y){
                 roads[i][j].next4 = &roads[i][j+1];
             }
-            if(flag == 0 && j != 0 && j != 2*bounds.y)
+            if(flag == 0 && i != 0 && i != 2*bounds.x)
                 flag = 1;
-            else if(flag == 1 && j != 0 && j != 2*bounds.y)
+            else if(flag == i && i != 0 && j != 2*bounds.x)
                 flag = 0;
         }
     }
@@ -218,7 +218,7 @@ void print_controls(int code){
 }
 
 void status_window(){
-    
+    CLRSCR
     CUP(1,4)
 
     printf("    DIAGNOSTIC   WINDOW\n\n");
@@ -266,7 +266,7 @@ int check_kb(){
         case 'R':
             screen_size();
 	        populate_map(bounds.x,bounds.y);
-            rc = 0;
+            rc = 1;
 	        break;
         case 'd':
         case 'D':
