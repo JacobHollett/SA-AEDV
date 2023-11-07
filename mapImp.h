@@ -1,4 +1,7 @@
-/*Header file contains relevant includes, defintions, 
+/*AEDV Final Project header file
+Jacob Hollet & Paul Sujith
+OCT 31, 2023
+Header file contains relevant includes, defintions, 
 globals, structures and function declerations.*/
 #pragma once
 
@@ -79,6 +82,7 @@ extern CELL **roads;
 extern AEDV *fleet;
 extern XY bounds;
 extern int STOP;    //loop stop controller
+extern float TIME;  //current time in clock ticks
 extern FILE* bfd;
 
 void terminate(char* msg);

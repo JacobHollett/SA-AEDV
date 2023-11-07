@@ -1,7 +1,12 @@
+/*AEDV Final Project functional file
+Jacob Hollet & Paul Sujith
+OCT 31, 2023
+Contains functions responsible for several processes*/
+
 #include "mapImp.h"
 
 
-void terminate(char* msg)
+void terminate(char* msg) //given error handling function
 {
 /* Fatal error detected - terminate */
 printf("Error: %s\n", msg);
@@ -9,8 +14,8 @@ printf("Error: %s\n", msg);
 exit(1);
 }
 
-void read_file(){
-    BLDNG bd;
+void read_file(){   //function reads through given standard binary file
+    BLDNG bd;       //and call appropiate functions to pass off read information.
     enum ST_DIR s1dir;
     enum AVE_DIR a1dir;
 
@@ -26,7 +31,7 @@ void read_file(){
 
     fread(&bd, sizeof(BLDNG), 1, bfd);
     
-    while(bd.x > 0){
+    while(bd.x > 0){    //token error handling so as not to assign properties to buildings outside range
         if(bd.x <= (bounds.x) && bd.y <= (bounds.y)){
             block[bd.x-1][bd.y-1].bt = bd.bt;
             block[bd.x-1][bd.y-1].qd = bd.qd;
@@ -72,9 +77,9 @@ void buildBlock(){  //dynamically creating 2D arrays of buildings and roads
 
     roads = (CELL**)malloc(sizeof(CELL) * ((2*bounds.x)+1));   //We create K more cells than is required,
     for(int i = 0; i < ((2*bounds.x)+1); i++)                    //where K is number of buildings, these cells
-        roads[i] = (CELL*)malloc(sizeof(CELL) * ((2*bounds.y)+1));    //are considered occupied
+        roads[i] = (CELL*)malloc(sizeof(CELL) * ((2*bounds.y)+1));    //are buildings and will in the future be
     
-    for(int i = 0; i < bounds.x; i++){
+    for(int i = 0; i < bounds.x; i++){                                //considered occupied
         for(int j = 0; j < bounds.y; j++){
             block[i][j].x = i;
             block[i][j].y = j;
@@ -98,7 +103,8 @@ void buildBlock(){  //dynamically creating 2D arrays of buildings and roads
 }
 
 void orient_roads(int a1, int s1){ 
-    
+    //algorithm to determine cell linkages based on road directions
+    //potential area of improvement
     int flag = s1;
     
     //East West Connections
@@ -140,17 +146,19 @@ void orient_roads(int a1, int s1){
             else if(flag == 1 && j != 2*bounds.y){
                 roads[i][j].next4 = &roads[i][j+1];
             }
-            if(flag == 0 && i != 0 && i != 2*bounds.x)
-                flag = 1;
-            else if(flag == i && i != 0 && j != 2*bounds.x)
-                flag = 0;
+            
         }
+        if(flag == 0 && i != 0 && i != 2*bounds.x)
+            flag = 1;
+        else if(flag == 1 && i != 0 && i != 2*bounds.x)
+            flag = 0;
     }
     
 }
 
 void build_fleet(){
     //dynamically creating fleet of four AEDV's
+    //similar to buildBlock
     fleet = (AEDV*)malloc(sizeof(AEDV*) * 4);
     for(int i = 0; i < 4; i++){
         fleet[i].x = 0;
@@ -162,7 +170,7 @@ void build_fleet(){
 }
 
 void box(int ulx, int uly, char *name, int colour, char *ID){
-
+    //draws a 4x4 box so as to simplify movement logic
     printf(CSI "%dm", colour);
     printf(ESC "(0");
 
@@ -181,7 +189,7 @@ void box(int ulx, int uly, char *name, int colour, char *ID){
 }
 
 void populate_map(){
-
+    //draws and labels buildings
     char name[] = "AA";
     char *ID;
 

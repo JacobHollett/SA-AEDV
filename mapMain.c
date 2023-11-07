@@ -1,3 +1,6 @@
+/*AEDV Final Project main file
+Jacob Hollet & Paul Sujith
+OCT 31, 2023*/
 #include "mapImp.h"
 
 HANDLE scrout, keyin;
@@ -8,13 +11,14 @@ CELL **roads;
 AEDV *fleet;
 XY bounds;
 int STOP = FALSE;
+float TIME = 0;
 
 
 
 int main(int argc, char *argv[]){
 
     long outmode;
-
+//boilerplate error checking for virtual vt100 terminal and input file
     /* Microsoft specific commands: */
     if ((scrout = GetStdHandle(STD_OUTPUT_HANDLE)) == INVALID_HANDLE_VALUE)
 	    terminate("Can't open output");
@@ -46,12 +50,7 @@ int main(int argc, char *argv[]){
 
     populate_map();
     move();
-    /*
-    while(!STOP){
-        if (_kbhit())
-			STOP = check_kb();
-    }
-    */
+    
     free(block);
     free(roads);
     free(fleet);

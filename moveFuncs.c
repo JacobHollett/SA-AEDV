@@ -91,10 +91,14 @@ void move(){
             
             } 
         }
+        CUP(4, scr_size.Y-2)
+        printf("Current time: %.2f", TIME);
+        TIME++;
         moves[0] = 0;
         moves[1] = 0;
         moves[2] = 0;
         moves[3] = 0;
+
     }
     
 }
