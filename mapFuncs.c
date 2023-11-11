@@ -226,6 +226,8 @@ void print_controls(int code){
 }
 
 void status_window(){
+    
+    printf(CSI "?1049h");
     CLRSCR
     CUP(1,4)
 
@@ -237,7 +239,7 @@ void status_window(){
     print_controls(2);
     while(!STOP){
         if (_kbhit())
-	        STOP = check_kb();
+	        check_kb();
     }
     
 
@@ -248,7 +250,7 @@ void set_dest(){
     int idval;
     int dstx;
     int dsty;
-    
+    printf(CSI "?1049h");
     CUP(1, 12)
     printf("\nInput AEDV ID: ");
     scanf("%i", &idval);
@@ -264,7 +266,7 @@ void set_dest(){
     status_window();
 }
 
-int check_kb(){
+void check_kb(){
 
     int rc;
     rc = (char)_getch();
@@ -274,30 +276,27 @@ int check_kb(){
         case 'R':
             screen_size();
 	        populate_map(bounds.x,bounds.y);
-            rc = 1;
+            STOP = 1;
 	        break;
         case 'd':
         case 'D':
-            printf(CSI "?1049h");
+            STOP = 0;
             status_window();
-            rc = 0;
 	        break;
         case 'm':
         case 'M':
             printf(CSI "?1049l");
-            rc = 1;
+            STOP = 1;
 	        break;
         case 'n':
         case 'N':
-            printf(CSI "?1049h");
+            STOP = 0;
             set_dest();
-            rc = 0;
             break;
         case '!':
-            rc = 2;
+            STOP = 2;
 	        break;
     }
     printf(CSI "?25l");	/* Hide cursor */
-    return rc;
 }
 

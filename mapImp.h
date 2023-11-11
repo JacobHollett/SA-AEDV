@@ -95,5 +95,5 @@ void box(int ulx, int uly, char *name, int colour, char *ID);
 void populate_map();
 void print_controls(int code);
 void status_window();
-int check_kb();
+void check_kb();
 void move();

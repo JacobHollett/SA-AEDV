@@ -51,7 +51,7 @@ void move(){
                 }
             }
             if (_kbhit())
-			    STOP = check_kb();
+			    check_kb();
         }
         for(int i = 0; i < 4; i++){
             for(int j = 0; j < 4; j++){
