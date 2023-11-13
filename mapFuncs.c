@@ -159,8 +159,8 @@ void orient_roads(int a1, int s1){
 void build_fleet(){
     //dynamically creating fleet of four AEDV's
     //similar to buildBlock
-    fleet = (AEDV*)malloc(sizeof(AEDV*) * 4);
-    for(int i = 0; i < 4; i++){
+    fleet = (AEDV*)malloc(sizeof(AEDV*) * fleetSize);
+    for(int i = 0; i < fleetSize; i++){
         fleet[i].x = 0;
         fleet[i].y = 0;
         fleet[i].destx = fleet[i].x;
@@ -232,7 +232,7 @@ void status_window(){
     CUP(1,4)
 
     printf("    DIAGNOSTIC   WINDOW\n\n");
-    for(int i = 0; i < 4; i++){
+    for(int i = 0; i < fleetSize; i++){
         printf("    AEDV #%i: %i,%i -> %i,%i\n", fleet[i].IDNUM, fleet[i].x, fleet[i].y, fleet[i].destx, fleet[i].desty);
     }
 

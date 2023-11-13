@@ -3,21 +3,18 @@
 void move(){
 
     CELL nextCell;
-    int moves[4]={0,0,0,0}; //hard coded for fleet number
-    XY a0[4];
+    int moves[fleetSize]; //hard coded for fleet number
+    XY a0[fleetSize];
     //temporary hard coded solution for a fleet of 4 aedv's
     //Entire path finding algorithm requires reworking
     while(STOP != 2){
-        a0[0].x = fleet[0].x;
-        a0[0].y = fleet[0].y;
-        a0[1].x = fleet[1].x;
-        a0[1].y = fleet[1].y;
-        a0[2].x = fleet[2].x;
-        a0[2].y = fleet[2].y;
-        a0[3].x = fleet[3].x;
-        a0[3].y = fleet[3].y;
+        for(int i = 0; i < fleetSize; i++){
+            a0[i].x = fleet[i].x;
+            a0[i].y = fleet[i].y;
+        }
         
-        for(int i = 0; i < 4; i++){
+        
+        for(int i = 0; i < fleetSize; i++){
             if(fleet[i].x != fleet[i].destx){
                 if(roads[fleet[i].x][fleet[i].y].next1){
                     nextCell = (*roads[fleet[i].x][fleet[i].y].next1);
@@ -94,10 +91,9 @@ void move(){
         CUP(4, scr_size.Y-2)
         printf("Current time: %.2f", TIME);
         TIME++;
-        moves[0] = 0;
-        moves[1] = 0;
-        moves[2] = 0;
-        moves[3] = 0;
+        for(int i = 0; i < fleetSize; i++){
+            moves[i] = 0;
+        }
 
     }
     

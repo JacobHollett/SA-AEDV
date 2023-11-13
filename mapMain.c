@@ -10,9 +10,9 @@ BLDNG **block;
 CELL **roads;
 AEDV *fleet;
 XY bounds;
-int STOP = FALSE;
+int fleetSize = 4;
+int STOP = 1;
 float TIME = 0;
-
 
 
 int main(int argc, char *argv[]){

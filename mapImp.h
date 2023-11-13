@@ -81,6 +81,7 @@ extern BLDNG **block;
 extern CELL **roads;
 extern AEDV *fleet;
 extern XY bounds;
+extern int fleetSize;
 extern int STOP;    //loop stop controller
 extern float TIME;  //current time in clock ticks
 extern FILE* bfd;
