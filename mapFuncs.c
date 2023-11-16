@@ -166,6 +166,8 @@ void build_fleet(){
         fleet[i].destx = fleet[i].x;
         fleet[i].desty = fleet[i].y;
         fleet[i].IDNUM = i+1;
+        fleet[i].battery = 60;
+        fleet[i].state = 0;
     }
 }
 
@@ -233,7 +235,8 @@ void status_window(){
 
     printf("    DIAGNOSTIC   WINDOW\n\n");
     for(int i = 0; i < fleetSize; i++){
-        printf("    AEDV #%i: %i,%i -> %i,%i\n", fleet[i].IDNUM, fleet[i].x, fleet[i].y, fleet[i].destx, fleet[i].desty);
+        printf("    AEDV #%i: %i,%i -> %i,%i  Battery Level:%i\n",
+         fleet[i].IDNUM, fleet[i].x, fleet[i].y, fleet[i].destx, fleet[i].desty, fleet[i].battery);
     }
 
     print_controls(2);

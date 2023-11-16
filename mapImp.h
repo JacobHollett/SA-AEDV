@@ -48,9 +48,11 @@ enum QUAD { NE, N, NW, E, LBL, W, SE, S, SW };
 
 
 typedef struct aedv{
+    int state; //0 is idle 1 is active
     int IDNUM;
     int x,y;
     int destx, desty;
+    int battery;
 }AEDV;
 
 typedef struct bldng{
