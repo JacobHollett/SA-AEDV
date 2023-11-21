@@ -5,6 +5,7 @@
 #include <fcntl.h>
 
 #define NAMELEN	16	/* Filename length */
+#define LINELENGTH 256
 
 // Following code is taken from the order-converter file on github
 enum REC_STATUS {ACTIVE, DELETED};
@@ -35,13 +36,8 @@ int main(int argc, char *argv[]) {
 }
 
     FILE* binary_fp = fopen(BinaryFile, "wb");
-    if (binary_fp == NULL) {
-        printf("Failed to open the binary file.\n");
-        fclose(csv_fp);
-        return 1;
-    }
 
-    char line[256];
+    char line[LINELENGTH];
     CUSTOMER customer;
 
     // Read each line from the CSV file
@@ -62,6 +58,8 @@ int main(int argc, char *argv[]) {
 
     fclose(binary_fp);
 
+//Supposed to print this but it does not for some odd reason
+//The .exe itself does not open so maybe thats why. It just creates the binary file
     printf("01010100 01101000 01100101 00100000 01000011 01110101 01110011 01110100 01101111 01101101 01100101 01110010 00100000 01101001 01110011 00100000 01101110 01100101 01110110 01100101 01110010 00100000 01110010 01101001 01100111 01101000 01110100.\n");
 
     return 0;
