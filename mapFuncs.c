@@ -168,6 +168,7 @@ void build_fleet(){
         fleet[i].IDNUM = i+1;
         fleet[i].battery = 60;
         fleet[i].state = 0;
+        fleet[i].pathStep = 0;
     }
 }
 
@@ -258,14 +259,15 @@ void set_dest(){
     printf("\nInput AEDV ID: ");
     scanf("%i", &idval);
     getchar();
+    idval--;
     printf("Input new destination x coordinate: ");
     scanf("%i", &dstx);
     getchar();
     printf("Input new destination y coordinate: ");
     scanf("%i", &dsty);
-    getchar();
-    fleet[idval-1].destx = dstx;
-    fleet[idval-1].desty = dsty;
+    fleet[idval].destx = dstx;
+    fleet[idval].desty = dsty;
+    find_path(idval);
     status_window();
 }
 
