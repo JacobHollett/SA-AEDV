@@ -10,7 +10,7 @@ BLDNG **block;
 CELL **roads;
 AEDV *fleet;
 XY bounds;
-int fleetSize = 4;
+int fleetSize = 5;
 int STOP = 1;
 float TIME = 0;
 
@@ -18,7 +18,7 @@ float TIME = 0;
 int main(int argc, char *argv[]){
 
     long outmode;
-//boilerplate error checking for virtual vt100 terminal and input file
+    //boilerplate error checking for virtual vt100 terminal and input file
     /* Microsoft specific commands: */
     if ((scrout = GetStdHandle(STD_OUTPUT_HANDLE)) == INVALID_HANDLE_VALUE)
 	    terminate("Can't open output");

@@ -28,8 +28,8 @@ globals, structures and function declerations.*/
 #define CUP(c,r)	printf(CSI "%d;%dH", (r), (c)); /* Move cursor position to col, row */
 #define EL(r)		printf(CSI "%d;1H" CSI "K", (r)); /* Erase in Line */
 #define CLRSCR		printf(CSI "2J");
-#define MAXPATHLENGTH 100 //placeholder maximum length of path
-#define BIGNUM 100000 //big number for placeholder F values in calc_path
+#define MAXPATHLENGTH 900 //placeholder maximum length of path
+#define BIGNUM 99999999 //big number for placeholder F values in calc_path
 
 /* Colour: ESC [ <n> m */
 enum VT100_COLOURS {
@@ -56,6 +56,7 @@ typedef struct aedv{
     int battery;
     int pathStep;
     int path[MAXPATHLENGTH];
+    int load;
 }AEDV;
 
 typedef struct bldng{

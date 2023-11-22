@@ -110,46 +110,40 @@ void find_path(int k){  //simple pathfinding algorithm
     int i = 0; //index of move in path
     int j = 0; //direction of chosen move (1,2,3,4)
     int z = BIGNUM; //lowest f value for comparison
-    int g; //distance between cell and starting cell
-    int h; //square of distance between cell and destination cell
-    int f[4]; //list of possible
+    int h = 0; //square of distance between cell and destination cell
+    int f[4]; //list of scores of possible moves
     CELL currentCell = roads[fleet[k].x][fleet[k].y];
     CELL nextCell;
     while(currentCell.x != fleet[k].destx || currentCell.y != fleet[k].desty){
         if(currentCell.next1 && parent != 2){
             nextCell = *currentCell.next1;
-            g = abs(nextCell.x-fleet[k].x)+abs(nextCell.y-fleet[k].y);
             h = abs(fleet[k].destx - nextCell.x)*abs(fleet[k].destx - nextCell.x) + 
                 abs(fleet[k].desty - nextCell.y)*abs(fleet[k].desty - nextCell.y);
-            f[0] = g+h;
+            f[0] = h;
         }else{f[0] = BIGNUM;} //Arbitrarily high number so as not to choose this direction
 
         if(currentCell.next2 && parent != 1){
             nextCell = *currentCell.next2;
-            g = abs(nextCell.x-fleet[k].x)+abs(nextCell.y-fleet[k].y);
             h = abs(fleet[k].destx - nextCell.x)*abs(fleet[k].destx - nextCell.x) + 
                 abs(fleet[k].desty - nextCell.y)*abs(fleet[k].desty - nextCell.y);
-            f[1] = g+h;
+            f[1] = h;
         }else{f[1] = BIGNUM;}
 
         if(currentCell.next3 && parent != 4){
             nextCell = *currentCell.next3;
-            g = abs(nextCell.x-fleet[k].x)+abs(nextCell.y-fleet[k].y);
             h = abs(fleet[k].destx - nextCell.x)*abs(fleet[k].destx - nextCell.x) + 
                 abs(fleet[k].desty - nextCell.y)*abs(fleet[k].desty - nextCell.y);
-            f[2] = g+h;
+            f[2] = h;
         }else{f[2] = BIGNUM;}
 
         if(currentCell.next4 && parent != 3){
             nextCell = *currentCell.next4;
-            g = abs(nextCell.x-fleet[k].x)+abs(nextCell.y-fleet[k].y);
             h = abs(fleet[k].destx - nextCell.x)*abs(fleet[k].destx - nextCell.x) + 
                 abs(fleet[k].desty - nextCell.y)*abs(fleet[k].desty - nextCell.y);
-            f[3] = g+h;
+            f[3] = h;
         }else{f[3] = BIGNUM;}
 
         for(int l = 0; l < 4; l++){
-            
             if(f[l] <= z){
                 z = f[l];
                 j = l+1;
@@ -175,9 +169,9 @@ void find_path(int k){  //simple pathfinding algorithm
                 parent = 4;
                 break;
         }
-
         fleet[k].path[i] = j;
         i++;
         z = BIGNUM; //reset z
     }
+    
 }

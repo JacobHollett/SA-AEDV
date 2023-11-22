@@ -169,6 +169,7 @@ void build_fleet(){
         fleet[i].battery = 60;
         fleet[i].state = 0;
         fleet[i].pathStep = 0;
+        fleet[i].load = 0;
     }
 }
 
@@ -234,14 +235,16 @@ void status_window(){
     CLRSCR
     CUP(4,4)
     printf(CSI "%dm", BGBLUE);
-    printf("              DIAGNOSTIC   WINDOW               ");
+    printf("                        DIAGNOSTIC   WINDOW                         ");
     CUP(4,5)
-    printf(" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ");
+    printf(" ~~~~~~~~~~~~~~~~~~~~~~~~AEDV  INFORMATION~~~~~~~~~~~~~~~~~~~~~~~~~ ");
+    CUP(4,6)
     for(int i = 0; i < fleetSize; i++){
-        CUP(4,6+i)
-        printf(" AEDV #%i: %i,%i -> %i,%i  Battery Level:%i  State:%i ",
-         fleet[i].IDNUM, fleet[i].x, fleet[i].y, fleet[i].destx, fleet[i].desty, fleet[i].battery, fleet[i].state);
+        printf(" AEDV #%i: %i,%i -> %i,%i  Battery Level:%i  State:%i  Current Load: %i Kg ",
+         fleet[i].IDNUM, fleet[i].x, fleet[i].y, fleet[i].destx, fleet[i].desty, fleet[i].battery, fleet[i].state, fleet[i].load);
+        CUP(4,7+i)
     }
+    printf(" ~~~~~~~~~~~~~~~~~~~~~~~~DELIVERY REQUESTS~~~~~~~~~~~~~~~~~~~~~~~~~ ");
     printf(CSI "0m");
     print_controls(2);
     while(!STOP){
@@ -268,6 +271,7 @@ void set_dest(){
     scanf("%i", &dsty);
     fleet[idval].destx = dstx;
     fleet[idval].desty = dsty;
+    getchar();
     find_path(idval);
     status_window();
 }
