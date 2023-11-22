@@ -1,5 +1,6 @@
 #include "mapImp.h"
-
+/*Collection of functions related to AEDV movement,
+both drawn and calculated. Jacob Hollett & Paul Sujith OCT 31 2023*/
 void move(){
 
     CELL nextCell;        //placeholder next cell to check for occupancy
@@ -15,6 +16,10 @@ void move(){
 
         for(int i = 0; i < fleetSize; i++){
             roads[fleet[i].x][fleet[i].y].occupied = 0; //stopped AEDV's are considered off the road and passable
+            if(fleet[i].battery < 15){
+                check_for_charger(i);
+                fleet[i].state = 2;
+            }
             if(fleet[i].x != fleet[i].destx || fleet[i].y != fleet[i].desty){
                 fleet[i].state = 1;
                 moves[i] = fleet[i].path[fleet[i].pathStep];
@@ -43,8 +48,17 @@ void move(){
                 }                 //and simply do not move for that time
                 
             }
-            else{
-                fleet[i].state = 0;    //if we are at our destination reset our path index and go inactive
+            else{   //if we are at our destination reset our path index and go inactive or start charging
+                if(fleet[i].state == 2 || (fleet[i].state == 3 && fleet[i].battery < 60)){
+                    fleet[i].state = 3;
+                }
+                else if(fleet[i].state == 3 && fleet[i].battery == 60){
+                    fleet[i].state = 0;
+                    fleet[i].destx = fleet[i].prevx;
+                    fleet[i].desty = fleet[i].prevy;
+                    find_path(i);
+                }
+                else{fleet[i].state = 0;}
                 fleet[i].pathStep = 0;
             }
         }
@@ -54,8 +68,10 @@ void move(){
 
         
         for(int i = 0; i < fleetSize; i++){
-            if(fleet[i].state == 1)
+            if(fleet[i].state == 1 || fleet[i].state == 2)
                 fleet[i].battery--; //decrement battery level if AEDV has moved
+            if(fleet[i].state == 3)
+                fleet[i].battery++;
 
             for(int j = 0; j < fleetSize; j++){
                 if(moves[j] == 1){
@@ -174,4 +190,52 @@ void find_path(int k){  //simple pathfinding algorithm
         z = BIGNUM; //reset z
     }
     
+}
+
+void check_for_charger(int k){ //finds nearest charging station, sets nearby street as new destination and
+                               //calls find_path to set a path to it.
+    int f = BIGNUM;
+    int tempf;
+    XY chgLoc;
+
+    //looking for closest charging station
+    for(int i = 0; i < bounds.x; i++){
+        for(int j = 0; j < bounds.y; j++){
+            if(block[i][j].bt == 0 || block[i][j].bt == 2){
+                tempf = abs(fleet[k].x-2*i+1)+abs(fleet[k].y-2*j+1); //accounts for the fact building[0][0] is cell[1][1] etc.
+                if(tempf < f){
+                    f = tempf;
+                    switch(block[i][j].qd){
+                        case 0:
+                        case 1:
+                        case 2:
+                            chgLoc.x = 2*i + 1;
+                            chgLoc.y = 2*j + 1 - 1;
+                            break;
+                        case 3:
+                        case 4:
+                            chgLoc.x = 2*i + 1 + 1;
+                            chgLoc.y = 2*j + 1;
+                            break;
+                        case 5:
+                            chgLoc.x = 2*i + 1 - 1;
+                            chgLoc.y = 2*j + 1;
+                            break;
+                        case 6:
+                        case 7:
+                        case 8:
+                            chgLoc.x = 2*i + 1;
+                            chgLoc.y = 2*j + 1 + 1;
+                            break;
+                    }
+                }
+            }
+        }
+    }
+    fleet[k].prevx = fleet[k].destx;
+    fleet[k].prevy = fleet[k].prevy;
+    fleet[k].destx = chgLoc.x;
+    fleet[k].desty = chgLoc.y;
+    fleet[k].pathStep = 0; //reset path index to reroute
+    find_path(k);
 }

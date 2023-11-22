@@ -235,16 +235,16 @@ void status_window(){
     CLRSCR
     CUP(4,4)
     printf(CSI "%dm", BGBLUE);
-    printf("                        DIAGNOSTIC   WINDOW                         ");
+    printf("                           DIAGNOSTIC  WINDOW                            ");
     CUP(4,5)
-    printf(" ~~~~~~~~~~~~~~~~~~~~~~~~AEDV  INFORMATION~~~~~~~~~~~~~~~~~~~~~~~~~ ");
+    printf(" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~AEDV  REPORT~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ");
     CUP(4,6)
     for(int i = 0; i < fleetSize; i++){
-        printf(" AEDV #%i: %i,%i -> %i,%i  Battery Level:%i  State:%i  Current Load: %i Kg ",
+        printf(" AEDV #%i: %2i,%2i -> %2i,%2i  Battery Level:%2i  State:%i  Current Load: %2i Kg ",
          fleet[i].IDNUM, fleet[i].x, fleet[i].y, fleet[i].destx, fleet[i].desty, fleet[i].battery, fleet[i].state, fleet[i].load);
         CUP(4,7+i)
     }
-    printf(" ~~~~~~~~~~~~~~~~~~~~~~~~DELIVERY REQUESTS~~~~~~~~~~~~~~~~~~~~~~~~~ ");
+    printf(" ~~~~~~~~~~~~~~~~~~~~~~~~~~DELIVERY  REQUESTS~~~~~~~~~~~~~~~~~~~~~~~~~~~ ");
     printf(CSI "0m");
     print_controls(2);
     while(!STOP){

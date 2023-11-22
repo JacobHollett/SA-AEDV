@@ -49,17 +49,18 @@ enum QUAD { NE, N, NW, E, LBL, W, SE, S, SW };
 
 
 typedef struct aedv{
-    int state; //0 is idle 1 is active
+    int state; //0 is idle 1 is active 2 is looking for charger 3 is charging
     int IDNUM;
     int x,y;
     int destx, desty;
+    int prevx, prevy; // previous destination point, needs to be held in case of charging event
     int battery;
     int pathStep;
     int path[MAXPATHLENGTH];
     int load;
 }AEDV;
 
-typedef struct bldng{
+typedef struct bldng{ //standard building structure. Cannot change.
     int x;
     int y;
     enum BLDG_TYPE bt;
@@ -105,3 +106,4 @@ void status_window();
 void check_kb();
 void move();
 void find_path(int k);
+void check_for_charger(int k);
