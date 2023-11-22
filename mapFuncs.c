@@ -91,7 +91,7 @@ void buildBlock(){  //dynamically creating 2D arrays of buildings and roads
         for(int j = 0; j <= (2*bounds.y); j++){
             roads[i][j].x = i;
             roads[i][j].y = j;
-            
+            roads[i][j].occupied = 0;
             roads[i][j].next1 = NULL;
             roads[i][j].next2 = NULL;
             roads[i][j].next3 = NULL;
@@ -187,7 +187,7 @@ void box(int ulx, int uly, char *name, int colour, char *ID){
     printf("mqqj");			/* LL Hor Hor LR */
     
     printf(ESC "(B");		/* Return to ASCII */
-    printf(CSI "0m");		/* Return to default FG anf BG */
+    printf(CSI "0m");		/* Return to default FG and BG */
 
 }
 
@@ -232,21 +232,22 @@ void status_window(){
     
     printf(CSI "?1049h");
     CLRSCR
-    CUP(1,4)
-
-    printf("    DIAGNOSTIC   WINDOW\n\n");
+    CUP(4,4)
+    printf(CSI "%dm", BGBLUE);
+    printf("              DIAGNOSTIC   WINDOW               ");
+    CUP(4,5)
+    printf(" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ");
     for(int i = 0; i < fleetSize; i++){
-        printf("    AEDV #%i: %i,%i -> %i,%i  Battery Level:%i\n",
-         fleet[i].IDNUM, fleet[i].x, fleet[i].y, fleet[i].destx, fleet[i].desty, fleet[i].battery);
+        CUP(4,6+i)
+        printf(" AEDV #%i: %i,%i -> %i,%i  Battery Level:%i  State:%i ",
+         fleet[i].IDNUM, fleet[i].x, fleet[i].y, fleet[i].destx, fleet[i].desty, fleet[i].battery, fleet[i].state);
     }
-
+    printf(CSI "0m");
     print_controls(2);
     while(!STOP){
         if (_kbhit())
 	        check_kb();
     }
-    
-
 }
 
 void set_dest(){

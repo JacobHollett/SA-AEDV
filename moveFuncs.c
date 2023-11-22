@@ -2,11 +2,10 @@
 
 void move(){
 
-    CELL nextCell, nextNextCell; //placeholder next cell to compare coordinates against
+    CELL nextCell;        //placeholder next cell to check for occupancy
     int moves[fleetSize]; //records direction of movement
-    XY a0[fleetSize]; //saved previous positions for displaying movement
+    XY a0[fleetSize];     //saved previous positions for displaying movement
     
-
     while(STOP != 2){
 
         for(int i = 0; i < fleetSize; i++){
@@ -15,27 +14,37 @@ void move(){
         }
 
         for(int i = 0; i < fleetSize; i++){
+            roads[fleet[i].x][fleet[i].y].occupied = 0; //stopped AEDV's are considered off the road and passable
             if(fleet[i].x != fleet[i].destx || fleet[i].y != fleet[i].desty){
                 fleet[i].state = 1;
                 moves[i] = fleet[i].path[fleet[i].pathStep];
-                switch(moves[i]){
-                    case 1:
-                        fleet[i].x--;
-                        break;
-                    case 2:
-                        fleet[i].x++;
-                        break;
-                    case 3:
-                        fleet[i].y--;
-                        break;
-                    case 4:
-                        fleet[i].y++;
-                        break;
+                if(moves[i] == 1 && roads[fleet[i].x-1][fleet[i].y].occupied == 0){
+                    fleet[i].x--;
+                    fleet[i].pathStep++;
+                    roads[fleet[i].x][fleet[i].y].occupied = 1;
+                    }
+                else if(moves[i] == 2 && roads[fleet[i].x+1][fleet[i].y].occupied == 0){
+                    fleet[i].x++;
+                    fleet[i].pathStep++;
+                    roads[fleet[i].x][fleet[i].y].occupied = 1;
                 }
-                fleet[i].pathStep++;
+                else if(moves[i] == 3 && roads[fleet[i].x][fleet[i].y-1].occupied == 0){
+                    fleet[i].y--;
+                    fleet[i].pathStep++;
+                    roads[fleet[i].x][fleet[i].y].occupied = 1;
+                }
+                else if(moves[i] == 4 && roads[fleet[i].x][fleet[i].y+1].occupied == 0){
+                    fleet[i].y++;
+                    fleet[i].pathStep++;
+                    roads[fleet[i].x][fleet[i].y].occupied = 1;
+                }
+                else{
+                    moves[i] = 0; //if the cell an AEDV is trying to move to is occupied, we avoid the collision
+                }                 //and simply do not move for that time
+                
             }
             else{
-                fleet[i].state = 0;    //if we are at our destination reset our path inex and go inactive
+                fleet[i].state = 0;    //if we are at our destination reset our path index and go inactive
                 fleet[i].pathStep = 0;
             }
         }

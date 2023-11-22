@@ -1,0 +1,2 @@
+mapmake: mapMain.c mapFuncs.c moveFuncs.c
+	gcc gcc -o testBranch.exe .\mapMain.c .\mapFuncs.c .\moveFuncs.c -I
