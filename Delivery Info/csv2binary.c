@@ -50,7 +50,8 @@ int main(int argc, char *argv[]) {
     char line[256];
     CUSTOMER customer;
 
-    //Should (theoretically) skip over the first line
+    //This line of code should (theoretically) skip over the first line
+    //So should remove these comment tages if we add headers to the csv file
     //fgets(line, sizeof(line), csv_fp);
 
     //Read each line from the CSV file
@@ -67,6 +68,7 @@ int main(int argc, char *argv[]) {
 
         // Write the customer struct to the binary file
         fwrite(&customer, sizeof(customer), 1, binary_fp);
+        //1 is the number of elements. Took some trial-and-error to find out if there were 8 elements or if the whole struct counted as one
     }
 
     fclose(binary_fp);
