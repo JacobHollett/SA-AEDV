@@ -32,6 +32,8 @@ globals, structures and function declerations.*/
 #define BIGNUM 99999999 //big number for placeholder F values in calc_path
 #define MAXEVENTS 100
 #define MAXLINELENGTH 50
+#define database "customers.bin"
+#define NAMELEN 16 //maximum name length
 
 /* Colour: ESC [ <n> m */
 enum VT100_COLOURS {
@@ -48,6 +50,7 @@ enum ST_DIR { East, West };
 enum AVE_DIR { North, South };
 enum BLDG_TYPE { CHG, STB, BOTH, NEITHER};
 enum QUAD { NE, N, NW, E, LBL, W, SE, S, SW };
+enum REC_STATUS {ACTIVE, DELETED};
 
 
 typedef struct aedv{
@@ -56,10 +59,13 @@ typedef struct aedv{
     int x,y;
     int destx, desty;
     int prevx, prevy; // previous destination point, needs to be held in case of charging event
+    int nextx, nexty; // next destination, used only for deliveries
+    int climbTime; //stores time taken to pick up and drop off
     int battery;
     int pathStep;
     int path[MAXPATHLENGTH];
     int load;
+    int potLoad; //hiding next load in here
 }AEDV;
 
 typedef struct bldng{ //standard building structure. Cannot change.
@@ -91,6 +97,16 @@ typedef struct xy{
     int y;
 }XY;
 
+typedef struct customer{
+    enum REC_STATUS status; 
+    char lname[NAMELEN]; 
+    char fname[NAMELEN];
+    int id; 
+    XY bld;
+    enum QUAD quadrant;
+    int floor; 
+}CUSTOMER;
+
 extern HANDLE scrout, keyin;
 extern COORD scr_size;
 extern BLDNG **block;
@@ -100,8 +116,11 @@ extern XY bounds;
 extern int fleetSize;
 extern int STOP;    //loop stop controller
 extern float TIME;  //current time in clock ticks
-extern FILE *bfd;
+extern FILE *bfd;   //building file descriptor
+extern FILE *cdf;   //customer data file
 extern EVENT eventList[];
+extern int eventCounter;
+
 
 void terminate(char* msg);
 void read_file();
@@ -118,3 +137,4 @@ void move();
 void find_path(int k);
 void check_for_charger(int k);
 void read_events();
+void check_events();

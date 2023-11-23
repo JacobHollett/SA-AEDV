@@ -6,7 +6,7 @@ void move(){
     CELL nextCell;        //placeholder next cell to check for occupancy
     int moves[fleetSize]; //records direction of movement
     XY a0[fleetSize];     //saved previous positions for displaying movement
-    int eventCounter = 0; //counter for current delivery event
+    
 
     while(STOP != 2){
 
@@ -17,7 +17,7 @@ void move(){
 
         for(int i = 0; i < fleetSize; i++){
             roads[fleet[i].x][fleet[i].y].occupied = 0; //stopped AEDV's are considered off the road and passable
-            if(fleet[i].battery < 15){
+            if(fleet[i].battery < 20){
                 check_for_charger(i);
                 fleet[i].state = 2;
             }
@@ -49,7 +49,7 @@ void move(){
                 }                 //and simply do not move for that time
                 
             }
-            else{   //if we are at our destination reset our path index and go inactive or start charging
+            else{   //if we are at our destination reset our path index and go inactive, start charging or deliver as appropiate
                 if(fleet[i].state == 2 || (fleet[i].state == 3 && fleet[i].battery < 60)){
                     fleet[i].state = 3;
                 }
@@ -59,7 +59,23 @@ void move(){
                     fleet[i].desty = fleet[i].prevy;
                     find_path(i);
                 }
-                else{fleet[i].state = 0;}
+                else if(fleet[i].state == 1 && fleet[i].nextx != 0 && fleet[i].nexty != 0){
+                    fleet[i].climbTime++;
+                    if(fleet[i].climbTime%4 == 0){
+                        fleet[i].load = fleet[i].potLoad;
+                        fleet[i].potLoad = 0;
+                        fleet[i].destx = fleet[i].nextx;
+                        fleet[i].desty = fleet[i].nexty;
+                        fleet[i].nextx = 0;
+                        fleet[i].nexty = 0;
+                        find_path(i);
+                    }
+
+                }
+                else{
+                    fleet[i].state = 0;
+                    fleet[i].load = 0;
+                    }
                 fleet[i].pathStep = 0;
             }
         }
@@ -67,7 +83,6 @@ void move(){
         if (_kbhit())
 			check_kb();
 
-        
         for(int i = 0; i < fleetSize; i++){
             if(fleet[i].state == 1 || fleet[i].state == 2)
                 fleet[i].battery--; //decrement battery level if AEDV has moved
@@ -119,17 +134,7 @@ void move(){
         }
 
         //check next event to see if it needs to be handled, and give event to the first idle AEDV
-        if(eventList[eventCounter].time <= TIME && eventList[eventCounter].time !=-1){
-            for(int i = 0; i < fleetSize; i++){
-                if(fleet[i].state == 0){
-                    fleet[i].destx = 4;
-                    fleet[i].desty = 4;
-                    eventCounter++;
-                    find_path(i);
-                    break;
-                }
-            }
-        }
+        check_events();
     }
 }
 
@@ -252,4 +257,71 @@ void check_for_charger(int k){ //finds nearest charging station, sets nearby str
     fleet[k].desty = chgLoc.y;
     fleet[k].pathStep = 0; //reset path index to reroute
     find_path(k);
+}
+
+void check_events(){
+
+    CUSTOMER customer1; //src customer
+    CUSTOMER customer2; //destination customer
+    if(eventList[eventCounter].time <= TIME && eventList[eventCounter].time !=-1){
+            for(int i = 0; i < fleetSize; i++){
+                if(fleet[i].state == 0){
+                    fseek(cdf, eventList[eventCounter].srcID%1000*sizeof(CUSTOMER),SEEK_SET);
+                    fread(&customer1, sizeof(CUSTOMER), 1, cdf);
+                    fseek(cdf, eventList[eventCounter].destID%1000*sizeof(CUSTOMER),SEEK_SET);
+                    fread(&customer2, sizeof(CUSTOMER), 1, cdf);
+                    //should make this switch it's own function, used frequently
+                    switch(customer1.quadrant){
+                        case 0:
+                        case 1:
+                        case 2:
+                            fleet[i].destx = 2*customer1.bld.x+1;
+                            fleet[i].desty = 2*customer1.bld.y+1-1;
+                            break;
+                        case 3:
+                        case 4:
+                            fleet[i].destx = 2*customer1.bld.x+1+1;
+                            fleet[i].desty = 2*customer1.bld.y+1;
+                            break;
+                        case 5:
+                            fleet[i].destx = 2*customer1.bld.x+1-1;
+                            fleet[i].desty = 2*customer1.bld.y+1;
+                            break;
+                        case 6:
+                        case 7:
+                        case 8:
+                            fleet[i].destx = 2*customer1.bld.x+1;
+                            fleet[i].desty = 2*customer1.bld.y+1+1;
+                            break;
+                    }
+                    switch(customer2.quadrant){
+                        case 0:
+                        case 1:
+                        case 2:
+                            fleet[i].nextx = 2*customer2.bld.x+1;
+                            fleet[i].nexty = 2*customer2.bld.y+1-1;
+                            break;
+                        case 3:
+                        case 4:
+                            fleet[i].nextx = 2*customer2.bld.x+1+1;
+                            fleet[i].nexty = 2*customer2.bld.y+1;
+                            break;
+                        case 5:
+                            fleet[i].nextx = 2*customer2.bld.x+1-1;
+                            fleet[i].nexty = 2*customer2.bld.y+1;
+                            break;
+                        case 6:
+                        case 7:
+                        case 8:
+                            fleet[i].nextx = 2*customer2.bld.x+1;
+                            fleet[i].nexty = 2*customer2.bld.y+1+1;
+                            break;
+                    }
+                    fleet[i].potLoad = eventList[eventCounter].weight;
+                    find_path(i);
+                    eventCounter++;
+                    break;
+                }
+            }
+        }
 }

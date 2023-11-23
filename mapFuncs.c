@@ -14,7 +14,7 @@ printf("Error: %s\n", msg);
 exit(1);
 }
 
-void read_file(){   //function reads through given standard binary file
+void read_file(){   //function reads through given standard binary file (building file)
     BLDNG bd;       //and call appropiate functions to pass off read information.
     enum ST_DIR s1dir;
     enum AVE_DIR a1dir;
@@ -170,6 +170,8 @@ void build_fleet(){
         fleet[i].state = 0;
         fleet[i].pathStep = 0;
         fleet[i].load = 0;
+        fleet[i].climbTime = 0;
+        fleet[i].potLoad = 0; 
     }
 }
 
@@ -225,7 +227,7 @@ void print_controls(int code){
     if(code == 1)
         printf("D = DIAGNOSTIC WINDOW           R = Resize Window           ! = END");
     else
-        printf("M = MAP WINDOW                  N = Set Destination         R = Resize Window           ! = END");
+        printf("M = MAP WINDOW  N = SET MANUAL DESTINATION  L = LOAD EVENT FILE     R = Resize Window   ! = END");
         printf(CSI "%dm", BGBLACK);
 }
 
@@ -250,11 +252,11 @@ void status_window(){
     printf(" ~~~~~~~~~~~~~~~~~~~~~~~~~~DELIVERY  REQUESTS~~~~~~~~~~~~~~~~~~~~~~~~~~~ ");
     ypos++;//for foromatting
     CUP(4,ypos)
-    printf(" TIME      Source Customer          Destination Cusomer           WEIGHT ");
+    printf(" TIME      Source Customer          Destination Customer          WEIGHT ");
     ypos++;
     while(eventList[counter].time != -1){
         CUP(4, ypos+counter)
-        printf("%4i       %4i                   %4i                 %3i ", 
+        printf("%4i       %4i                     %4i                          %3i Kg ", 
         eventList[counter].time, eventList[counter].srcID, eventList[counter].destID, eventList[counter].weight);
         counter++;
     }
@@ -315,6 +317,11 @@ void check_kb(){
         case 'n':
         case 'N':
             STOP = 0;
+            set_dest();
+            break;
+        case 'l':
+        case 'L':
+            STOP = 0;
             read_events();
             break;
         case '!':
@@ -328,7 +335,6 @@ void read_events(){
 
     printf(CSI "?1049h");
     CUP(1, 12)
-    
     FILE *inputFile;
     char fileName[MAXLINELENGTH]; //reuse this to read through lines
     int i = 0; //index of events

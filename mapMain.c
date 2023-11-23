@@ -6,6 +6,7 @@ OCT 31, 2023*/
 HANDLE scrout, keyin;
 COORD scr_size;
 FILE *bfd;
+FILE *cdf;
 BLDNG **block;
 CELL **roads;
 AEDV *fleet;
@@ -14,6 +15,7 @@ EVENT eventList[MAXEVENTS];
 int fleetSize = 5;
 int STOP = 1;
 float TIME = 0;
+int eventCounter = 0;
 
 
 int main(int argc, char *argv[]){
@@ -43,7 +45,8 @@ int main(int argc, char *argv[]){
 	getchar();
 	return 1;
     }
-
+    
+    cdf = fopen(database, "r");
     screen_size();
     read_file();
 
@@ -52,6 +55,7 @@ int main(int argc, char *argv[]){
     populate_map();
     move();
     
+    fclose(cdf);
     free(block);
     free(roads);
     free(fleet);
