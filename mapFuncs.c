@@ -235,6 +235,8 @@ void status_window(){
     CLRSCR
     CUP(4,4)
     printf(CSI "%dm", BGBLUE);
+    int ypos = 0;   //keeps track of cursor y position for formatting
+    int counter = 0; //index for event list
     printf("                           DIAGNOSTIC  WINDOW                            ");
     CUP(4,5)
     printf(" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~AEDV  REPORT~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ");
@@ -243,8 +245,20 @@ void status_window(){
         printf(" AEDV #%i: %2i,%2i -> %2i,%2i  Battery Level:%2i  State:%i  Current Load: %2i Kg ",
          fleet[i].IDNUM, fleet[i].x, fleet[i].y, fleet[i].destx, fleet[i].desty, fleet[i].battery, fleet[i].state, fleet[i].load);
         CUP(4,7+i)
+        ypos = i + 7;
     }
     printf(" ~~~~~~~~~~~~~~~~~~~~~~~~~~DELIVERY  REQUESTS~~~~~~~~~~~~~~~~~~~~~~~~~~~ ");
+    ypos++;//for foromatting
+    CUP(4,ypos)
+    printf(" TIME      Source Customer          Destination Cusomer           WEIGHT ");
+    ypos++;
+    while(eventList[counter].time != -1){
+        CUP(4, ypos+counter)
+        printf("%4i       %4i                   %4i                 %3i ", 
+        eventList[counter].time, eventList[counter].srcID, eventList[counter].destID, eventList[counter].weight);
+        counter++;
+    }
+
     printf(CSI "0m");
     print_controls(2);
     while(!STOP){
@@ -301,7 +315,7 @@ void check_kb(){
         case 'n':
         case 'N':
             STOP = 0;
-            set_dest();
+            read_events();
             break;
         case '!':
             STOP = 2;
@@ -310,3 +324,34 @@ void check_kb(){
     printf(CSI "?25l");	/* Hide cursor */
 }
 
+void read_events(){
+
+    printf(CSI "?1049h");
+    CUP(1, 12)
+    
+    FILE *inputFile;
+    char fileName[MAXLINELENGTH]; //reuse this to read through lines
+    int i = 0; //index of events
+    int tempTime;
+    int tempSrc, tempDst, tempWeight;
+    _set_fmode(O_TEXT);
+    printf("Enter name of event file: ");
+    scanf("%s", &fileName);
+    getchar();
+    inputFile = fopen(fileName, "r");
+    fgets(fileName,MAXLINELENGTH, inputFile); //skip over header
+    
+    while(fgets(fileName, MAXLINELENGTH, inputFile)){
+        sscanf(fileName, "%i%i%i%i", &tempTime,&tempSrc,&tempDst,&tempWeight);
+        eventList[i].time = tempTime;
+        eventList[i].srcID = tempSrc;
+        eventList[i].destID = tempDst;
+        eventList[i].weight = tempWeight;
+        i++;
+    }
+    eventList[i].time = -1; //setting final event list entry to -1 as an indicator
+    printf("Event File loaded! Press Enter to return to diagnostic window.");
+    getchar();
+    fclose(inputFile);
+    status_window();
+}

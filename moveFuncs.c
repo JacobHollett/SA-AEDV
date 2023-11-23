@@ -6,7 +6,8 @@ void move(){
     CELL nextCell;        //placeholder next cell to check for occupancy
     int moves[fleetSize]; //records direction of movement
     XY a0[fleetSize];     //saved previous positions for displaying movement
-    
+    int eventCounter = 0; //counter for current delivery event
+
     while(STOP != 2){
 
         for(int i = 0; i < fleetSize; i++){
@@ -115,6 +116,19 @@ void move(){
         TIME++;
         for(int i = 0; i < fleetSize; i++){
             moves[i] = 0;
+        }
+
+        //check next event to see if it needs to be handled, and give event to the first idle AEDV
+        if(eventList[eventCounter].time <= TIME && eventList[eventCounter].time !=-1){
+            for(int i = 0; i < fleetSize; i++){
+                if(fleet[i].state == 0){
+                    fleet[i].destx = 4;
+                    fleet[i].desty = 4;
+                    eventCounter++;
+                    find_path(i);
+                    break;
+                }
+            }
         }
     }
 }

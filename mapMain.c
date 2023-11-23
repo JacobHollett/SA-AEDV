@@ -10,6 +10,7 @@ BLDNG **block;
 CELL **roads;
 AEDV *fleet;
 XY bounds;
+EVENT eventList[MAXEVENTS];
 int fleetSize = 5;
 int STOP = 1;
 float TIME = 0;
@@ -47,7 +48,7 @@ int main(int argc, char *argv[]){
     read_file();
 
     build_fleet();
-
+    eventList[0].time = -1; //effectively empties internal event list
     populate_map();
     move();
     

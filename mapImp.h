@@ -30,6 +30,8 @@ globals, structures and function declerations.*/
 #define CLRSCR		printf(CSI "2J");
 #define MAXPATHLENGTH 900 //placeholder maximum length of path
 #define BIGNUM 99999999 //big number for placeholder F values in calc_path
+#define MAXEVENTS 100
+#define MAXLINELENGTH 50
 
 /* Colour: ESC [ <n> m */
 enum VT100_COLOURS {
@@ -77,6 +79,13 @@ typedef struct cell{    //roads structure mimics linked list
     int occupied;
 }CELL;
 
+typedef struct event{
+    int time;
+    int srcID;
+    int destID;
+    int weight;
+}EVENT;
+
 typedef struct xy{
     int x;
     int y;
@@ -91,7 +100,8 @@ extern XY bounds;
 extern int fleetSize;
 extern int STOP;    //loop stop controller
 extern float TIME;  //current time in clock ticks
-extern FILE* bfd;
+extern FILE *bfd;
+extern EVENT eventList[];
 
 void terminate(char* msg);
 void read_file();
@@ -107,3 +117,4 @@ void check_kb();
 void move();
 void find_path(int k);
 void check_for_charger(int k);
+void read_events();
