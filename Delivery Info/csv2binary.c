@@ -40,6 +40,7 @@ int main(int argc, char *argv[]) {
     }
 
     FILE* binary_fp = fopen(BinaryFile, "w");
+    //using w instead of wb because of the _set_fmode(_O_BINARY) thing at the start of int main
    if (binary_fp == NULL) {
        printf("Binary File not opened correctly");
        fclose(csv_fp); 
