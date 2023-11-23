@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
 
     //Read each struct from the binary file
     while (fread(&customer, sizeof(CUSTOMER), 1, binary_fp) == 1) {
-        fprintf(text_fp, "%d, %s, %s, %d, %d, %d, %d, %d", 
+        fprintf(text_fp, "%d, %s, %s, %d, %d, %d, %d, %d \n", 
                 customer.status,
                 customer.lname,
             	customer.fname,
