@@ -51,6 +51,8 @@ void move(){
             }
             else{   //if we are at our destination reset our path index and go inactive, start charging or deliver as appropiate
                 if(fleet[i].state == 2 || (fleet[i].state == 3 && fleet[i].battery < 60)){
+                    fleet[i].prevx = fleet[i].destx;
+                    fleet[i].prevy = fleet[i].desty;
                     fleet[i].state = 3;
                 }
                 else if(fleet[i].state == 3 && fleet[i].battery == 60){
