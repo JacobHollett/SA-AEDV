@@ -1,6 +1,0 @@
-Time	Event	Origin	Destination	Weight
-10  D  1002    1003    8
-23  D  1000    1001    14
-34  D  1001    1000    12
-40  D  1004    1006    28
-48  D  1005    1000    2
