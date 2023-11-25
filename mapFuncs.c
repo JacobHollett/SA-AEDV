@@ -252,11 +252,11 @@ void status_window(){
     printf(" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~NEXT  REQUEST~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ");
     ypos++;//for foromatting
     CUP(4,ypos)
-    printf(" TIME      Source Customer          Destination Customer          WEIGHT ");
+    printf(" TIME      TYPE    Source Customer    Destination Customer        WEIGHT ");
     ypos++;
     CUP(4, ypos)
-    printf("%4i       %4i                     %4i                          %3i Kg ", 
-        currentEvent.time, currentEvent.srcID, currentEvent.destID, currentEvent.weight);
+    printf("%4i       %c       %4i               %4i                        %3i Kg ", 
+        currentEvent.time, currentEvent.type, currentEvent.srcID, currentEvent.destID, currentEvent.weight);
     
 
     printf(CSI "0m");
@@ -350,11 +350,12 @@ void get_next_event(){
     char tempString[MAXLINELENGTH];
 
     if(fgets(tempString,MAXLINELENGTH, elf)){
-        sscanf(tempString, "%i%i%i%i", 
-        &currentEvent.time,&currentEvent.srcID,&currentEvent.destID,&currentEvent.weight);
+        sscanf(tempString, "%i %c%i%i%i", 
+        &currentEvent.time,&currentEvent.type,&currentEvent.srcID,&currentEvent.destID,&currentEvent.weight);
     }
     else{
         currentEvent.time = -1;
+        currentEvent.type = 'N';
         currentEvent.destID = 0000;
         currentEvent.srcID = 0000;
         currentEvent.weight = 0;

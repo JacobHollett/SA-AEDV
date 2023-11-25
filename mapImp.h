@@ -87,6 +87,7 @@ typedef struct cell{    //roads structure mimics linked list
 
 typedef struct event{
     int time;
+    char type;
     int srcID;
     int destID;
     int weight;

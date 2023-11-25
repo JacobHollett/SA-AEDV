@@ -54,6 +54,7 @@ int main(int argc, char *argv[]){
     build_fleet();
     populate_map();
     currentEvent.time = -1; //setting empty current event to be ignored
+    currentEvent.type = 'N';
     currentEvent.destID = 0000;
     currentEvent.srcID = 0000;
     currentEvent.weight = 0;
