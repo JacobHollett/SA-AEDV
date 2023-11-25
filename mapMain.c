@@ -5,17 +5,18 @@ OCT 31, 2023*/
 
 HANDLE scrout, keyin;
 COORD scr_size;
-FILE *bfd;
-FILE *cdf;
+FILE *bfd; //map file
+FILE *cdf; //customer database file
+FILE *elf;  //evemt log file
+FILE *olf; //output log file
 BLDNG **block;
 CELL **roads;
 AEDV *fleet;
 XY bounds;
-EVENT eventList[MAXEVENTS];
+EVENT currentEvent;
 int fleetSize = 5;
 int STOP = 1;
 float TIME = 0;
-int eventCounter = 0;
 
 
 int main(int argc, char *argv[]){
@@ -51,11 +52,16 @@ int main(int argc, char *argv[]){
     read_file();
 
     build_fleet();
-    eventList[0].time = -1; //effectively empties internal event list
     populate_map();
+    currentEvent.time = -1; //setting empty current event to be ignored
+    currentEvent.destID = 0000;
+    currentEvent.srcID = 0000;
+    currentEvent.weight = 0;
     move();
     
     fclose(cdf);
+    fclose(elf);
+    fclose(olf);
     free(block);
     free(roads);
     free(fleet);

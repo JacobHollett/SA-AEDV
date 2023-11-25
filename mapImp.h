@@ -118,8 +118,9 @@ extern int STOP;    //loop stop controller
 extern float TIME;  //current time in clock ticks
 extern FILE *bfd;   //building file descriptor
 extern FILE *cdf;   //customer data file
-extern EVENT eventList[];
-extern int eventCounter;
+extern FILE *elf;   //event list file
+extern FILE *olf;   //output log file
+extern EVENT currentEvent;
 
 
 void terminate(char* msg);
@@ -138,3 +139,4 @@ void find_path(int k);
 void check_for_charger(int k);
 void read_events();
 void check_events();
+void get_next_event();

@@ -249,17 +249,15 @@ void status_window(){
         CUP(4,7+i)
         ypos = i + 7;
     }
-    printf(" ~~~~~~~~~~~~~~~~~~~~~~~~~~DELIVERY  REQUESTS~~~~~~~~~~~~~~~~~~~~~~~~~~~ ");
+    printf(" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~NEXT  REQUEST~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ");
     ypos++;//for foromatting
     CUP(4,ypos)
     printf(" TIME      Source Customer          Destination Customer          WEIGHT ");
     ypos++;
-    while(eventList[counter].time != -1){
-        CUP(4, ypos+counter)
-        printf("%4i       %4i                     %4i                          %3i Kg ", 
-        eventList[counter].time, eventList[counter].srcID, eventList[counter].destID, eventList[counter].weight);
-        counter++;
-    }
+    CUP(4, ypos)
+    printf("%4i       %4i                     %4i                          %3i Kg ", 
+        currentEvent.time, currentEvent.srcID, currentEvent.destID, currentEvent.weight);
+    
 
     printf(CSI "0m");
     print_controls(2);
@@ -335,29 +333,30 @@ void read_events(){
 
     printf(CSI "?1049h");
     CUP(1, 12)
-    FILE *inputFile;
-    char fileName[MAXLINELENGTH]; //reuse this to read through lines
-    int i = 0; //index of events
-    int tempTime;
-    int tempSrc, tempDst, tempWeight;
+    char fileName[MAXLINELENGTH];
     _set_fmode(O_TEXT);
     printf("Enter name of event file: ");
     scanf("%s", &fileName);
     getchar();
-    inputFile = fopen(fileName, "r");
-    fgets(fileName,MAXLINELENGTH, inputFile); //skip over header
-    
-    while(fgets(fileName, MAXLINELENGTH, inputFile)){
-        sscanf(fileName, "%i%i%i%i", &tempTime,&tempSrc,&tempDst,&tempWeight);
-        eventList[i].time = tempTime;
-        eventList[i].srcID = tempSrc;
-        eventList[i].destID = tempDst;
-        eventList[i].weight = tempWeight;
-        i++;
-    }
-    eventList[i].time = -1; //setting final event list entry to -1 as an indicator
+    elf = fopen(fileName, "r");
+    fgets(fileName,MAXLINELENGTH, elf); //skip over header
+    get_next_event();
     printf("Event File loaded! Press Enter to return to diagnostic window.");
     getchar();
-    fclose(inputFile);
     status_window();
+}
+
+void get_next_event(){
+    char tempString[MAXLINELENGTH];
+
+    if(fgets(tempString,MAXLINELENGTH, elf)){
+        sscanf(tempString, "%i%i%i%i", 
+        &currentEvent.time,&currentEvent.srcID,&currentEvent.destID,&currentEvent.weight);
+    }
+    else{
+        currentEvent.time = -1;
+        currentEvent.destID = 0000;
+        currentEvent.srcID = 0000;
+        currentEvent.weight = 0;
+    }
 }

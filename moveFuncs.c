@@ -265,12 +265,12 @@ void check_events(){
 
     CUSTOMER customer1; //src customer
     CUSTOMER customer2; //destination customer
-    if(eventList[eventCounter].time <= TIME && eventList[eventCounter].time !=-1){
+    if(currentEvent.time <= TIME && currentEvent.time != -1){
             for(int i = 0; i < fleetSize; i++){
                 if(fleet[i].state == 0){
-                    fseek(cdf, eventList[eventCounter].srcID%1000*sizeof(CUSTOMER),SEEK_SET);
+                    fseek(cdf, currentEvent.srcID%1000*sizeof(CUSTOMER),SEEK_SET);
                     fread(&customer1, sizeof(CUSTOMER), 1, cdf);
-                    fseek(cdf, eventList[eventCounter].destID%1000*sizeof(CUSTOMER),SEEK_SET);
+                    fseek(cdf, currentEvent.destID%1000*sizeof(CUSTOMER),SEEK_SET);
                     fread(&customer2, sizeof(CUSTOMER), 1, cdf);
                     //should make this switch it's own function, used frequently
                     switch(customer1.quadrant){
@@ -319,9 +319,9 @@ void check_events(){
                             fleet[i].nexty = 2*customer2.bld.y+1+1;
                             break;
                     }
-                    fleet[i].potLoad = eventList[eventCounter].weight;
-                    find_path(i);
-                    eventCounter++;
+                    fleet[i].potLoad = currentEvent.weight;
+                    find_path(i); //find new path to destination
+                    get_next_event(); //and bump forward the current event
                     break;
                 }
             }
