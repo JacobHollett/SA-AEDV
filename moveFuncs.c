@@ -17,12 +17,14 @@ void move(){
 
         for(int i = 0; i < fleetSize; i++){
             roads[fleet[i].x][fleet[i].y].occupied = 0; //stopped AEDV's are considered off the road and passable
-            if(fleet[i].battery < 20){
+            if(fleet[i].battery < 20 && fleet[i].state != 2){ //dont recalc path to charger if we're already on the way
                 check_for_charger(i);
                 fleet[i].state = 2;
             }
             if(fleet[i].x != fleet[i].destx || fleet[i].y != fleet[i].desty){
-                fleet[i].state = 1;
+                if(fleet[i].state != 2){    //set any moving aedv not looking for charger to active
+                    fleet[i].state = 1;
+                }
                 moves[i] = fleet[i].path[fleet[i].pathStep];
                 if(moves[i] == 1 && roads[fleet[i].x-1][fleet[i].y].occupied == 0){
                     fleet[i].x--;
@@ -50,35 +52,7 @@ void move(){
                 
             }
             else{   //if we are at our destination reset our path index and go inactive, start charging or deliver as appropiate
-                if(fleet[i].state == 2 || (fleet[i].state == 3 && fleet[i].battery < 60)){
-                    fleet[i].prevx = fleet[i].destx;
-                    fleet[i].prevy = fleet[i].desty;
-                    fleet[i].state = 3;
-                }
-                else if(fleet[i].state == 3 && fleet[i].battery == 60){
-                    fleet[i].state = 0;
-                    fleet[i].destx = fleet[i].prevx;
-                    fleet[i].desty = fleet[i].prevy;
-                    find_path(i);
-                }
-                else if(fleet[i].state == 1 && fleet[i].nextx != 0 && fleet[i].nexty != 0){
-                    fleet[i].climbTime++;
-                    if(fleet[i].climbTime%4 == 0){
-                        fleet[i].load = fleet[i].potLoad;
-                        fleet[i].potLoad = 0;
-                        fleet[i].destx = fleet[i].nextx;
-                        fleet[i].desty = fleet[i].nexty;
-                        fleet[i].nextx = 0;
-                        fleet[i].nexty = 0;
-                        find_path(i);
-                    }
-
-                }
-                else{
-                    fleet[i].state = 0;
-                    fleet[i].load = 0;
-                    }
-                fleet[i].pathStep = 0;
+               handle_destination(i);
             }
         }
 
@@ -270,8 +244,10 @@ void check_events(){
                 if(fleet[i].state == 0){
                     fseek(cdf, currentEvent.srcID%1000*sizeof(CUSTOMER),SEEK_SET);
                     fread(&customer1, sizeof(CUSTOMER), 1, cdf);
+                    strcpy(fleet[i].srcName, customer1.lname);
                     fseek(cdf, currentEvent.destID%1000*sizeof(CUSTOMER),SEEK_SET);
                     fread(&customer2, sizeof(CUSTOMER), 1, cdf);
+                    strcpy(fleet[i].dstName, customer2.lname);
                     //should make this switch it's own function, used frequently
                     switch(customer1.quadrant){
                         case 0:
@@ -326,4 +302,42 @@ void check_events(){
                 }
             }
         }
+}
+
+void handle_destination(int k){
+
+    if(fleet[k].state == 2 || (fleet[k].state == 3 && fleet[k].battery < 60)){
+        fleet[k].state = 3;
+    }
+    else if(fleet[k].state == 3 && fleet[k].battery == 60){
+        fleet[k].state = 1;
+        fleet[k].destx = fleet[k].prevx;
+        fleet[k].desty = fleet[k].prevy;
+        find_path(k);
+    }
+    else if(fleet[k].state == 1 && fleet[k].load == 0){//pickup
+        fleet[k].climbTime++;
+        if(fleet[k].climbTime == 3){    //temporary placeholder for variable floor
+            fleet[k].load = fleet[k].potLoad;
+            fleet[k].potLoad = 0;
+            fleet[k].pickupTime = TIME;
+            fleet[k].destx = fleet[k].nextx;
+            fleet[k].desty = fleet[k].nexty;
+            find_path(k);
+            fleet[k].climbTime = 0;
+        }
+    }
+    else if(fleet[k].state == 1 && fleet[k].load != 0){
+        fleet[k].climbTime++;
+        if(fleet[k].climbTime == 3){
+            fprintf(olf, "%i    %.0f  %s  %s  %i\n", fleet[k].pickupTime, TIME, fleet[k].srcName, fleet[k].dstName, fleet[k].load);
+            fleet[k].load = fleet[k].potLoad;
+            fleet[k].state = 0;
+            fleet[k].climbTime = 0;
+        }
+    }
+    else{
+        fleet[k].state = 0;
+        }
+    fleet[k].pathStep = 0;
 }

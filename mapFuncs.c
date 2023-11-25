@@ -172,6 +172,7 @@ void build_fleet(){
         fleet[i].load = 0;
         fleet[i].climbTime = 0;
         fleet[i].potLoad = 0; 
+        fleet[i].pickupTime = 0;
     }
 }
 

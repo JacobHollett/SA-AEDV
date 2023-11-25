@@ -33,6 +33,7 @@ globals, structures and function declerations.*/
 #define MAXEVENTS 100
 #define MAXLINELENGTH 50
 #define database "customers.bin"
+#define log "deleveries.log"
 #define NAMELEN 16 //maximum name length
 
 /* Colour: ESC [ <n> m */
@@ -66,6 +67,9 @@ typedef struct aedv{
     int path[MAXPATHLENGTH];
     int load;
     int potLoad; //hiding next load in here
+    char srcName[MAXLINELENGTH];
+    char dstName[MAXLINELENGTH];
+    int pickupTime;
 }AEDV;
 
 typedef struct bldng{ //standard building structure. Cannot change.
@@ -141,3 +145,4 @@ void check_for_charger(int k);
 void read_events();
 void check_events();
 void get_next_event();
+void handle_destination(int k);

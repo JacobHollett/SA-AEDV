@@ -48,6 +48,8 @@ int main(int argc, char *argv[]){
     }
     
     cdf = fopen(database, "r");
+    olf = fopen(log,"w");
+    fprintf(olf, "Pickup Time   Drop Off Time   Source Customer Destination Customer    Weight\n");
     screen_size();
     read_file();
 
