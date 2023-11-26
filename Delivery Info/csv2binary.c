@@ -51,9 +51,7 @@ int main(int argc, char *argv[]) {
     char line[256];
     CUSTOMER customer;
 
-    //This line of code should (theoretically) skip over the first line
-    //So should remove these comment tages if we add headers to the csv file
-    //fgets(line, sizeof(line), csv_fp);
+    fgets(line, sizeof(line), csv_fp);
 
     //Read each line from the CSV file
     while (fgets(line, sizeof(line), csv_fp)) {
